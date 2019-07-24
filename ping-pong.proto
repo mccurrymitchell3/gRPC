@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message Ping {
+
+}
+
+message Pong {
+
+}
+
+service PingPongService {
+    rpc PingPong (Ping) returns (Pong) {}
+}
