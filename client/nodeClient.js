@@ -49,9 +49,43 @@ function bidirectionalStream() {
     call.end();
 }
 
+function bidirectionalStreamPingPong() {
+    let call = client.PingPongStream();
+    call.on('data', function(reply) {
+        console.log(reply.pong);
+    });
+
+    let names = [
+        'Mitch',
+        'Luwei',
+        'James',
+        'Matt',
+        'Vinny',
+        'Simon',
+        'Yiran',
+        'Prashant',
+        'Moumita',
+        'Wayne'
+    ];
+    const doForEach = (x) => {
+        if (x === names.length) {
+            call.end();
+        } else {
+            console.log('Sending ' + names[x]);
+            call.write({ ping: names[x] });
+            setTimeout(() => {
+                doForEach(x + 1);
+            }, 1000);
+        }
+    };
+
+    doForEach(0);
+}
+
 function main() {
-    //ping();
+    ping();
     bidirectionalStream();
+    bidirectionalStreamPingPong();
 }
 
 main();
