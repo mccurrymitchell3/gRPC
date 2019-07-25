@@ -13,12 +13,13 @@ const client = new pingPongPackageDefinition.PingPongService(
 // handlers
 function ping() {
     const payload = { ping: 'Mitch' };
+    console.log('Pinging');
     client.PingPong(payload, (err, result) => {
         if (err) {
             console.log(`Failed to Ping.\n${err}`);
         }
         else {
-            console.log(result);
+            console.log(result.pong);
         }
     });
 }
@@ -26,17 +27,23 @@ function ping() {
 function bidirectionalStream() {
     let call = client.PingPongStream();
     call.on('data', function(reply) {
-        console.log('Got pong ' + reply.pong);
+        console.log(reply.pong);
     });
-    call.on('end', function() {});
 
     let names = [
         'Mitch',
         'Luwei',
-        'James'
+        'James',
+        'Matt',
+        'Vinny',
+        'Simon',
+        'Yiran',
+        'Prashant',
+        'Moumita',
+        'Wayne'
     ];
     names.forEach((name) => {
-        console.log('Sending ping ' + name);
+        console.log('Sending ' + name);
         call.write({ ping: name });
     });
     call.end();
