@@ -17,11 +17,22 @@ function PingPong(call, callback) {
     callback(null, {pong: pong});
 }
 
+function PingPongStream(call) {
+    call.on('data', function(name) {
+        let reply = `Hello, ${name.ping}! This is ${os.hostname()}.`;
+        call.write({ pong: reply });
+    });
+    call.on('end', function() {
+        call.end();
+    });
+}
+
 function main() {
     const server = new grpc.Server();
     // gRPC service
     server.addService(pingPongServicePackageDefinition.PingPongService.service, {
-        PingPong
+        PingPong,
+        PingPongStream
     });
 
     // gRPC server

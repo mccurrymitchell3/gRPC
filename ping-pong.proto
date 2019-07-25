@@ -16,4 +16,6 @@ service PingPongService {
             get: "/pingpong/{ping}"
         };
     }
+
+    rpc PingPongStream (stream Ping) returns (stream Pong) {}
 }

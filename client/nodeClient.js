@@ -23,8 +23,28 @@ function ping() {
     });
 }
 
+function bidirectionalStream() {
+    let call = client.PingPongStream();
+    call.on('data', function(reply) {
+        console.log('Got pong ' + reply.pong);
+    });
+    call.on('end', function() {});
+
+    let names = [
+        'Mitch',
+        'Luwei',
+        'James'
+    ];
+    names.forEach((name) => {
+        console.log('Sending ping ' + name);
+        call.write({ ping: name });
+    });
+    call.end();
+}
+
 function main() {
-    ping();
+    //ping();
+    bidirectionalStream();
 }
 
 main();
