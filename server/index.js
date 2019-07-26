@@ -6,6 +6,12 @@ const protoLoader = require('@grpc/proto-loader');
 const grpc = require('grpc');
 const os = require('os');
 
+const { GrpcHealthCheck, HealthCheckResponse, HealthService } = require('grpc-ts-health-check');
+
+const healthCheckStatusMap = {
+    "": HealthCheckResponse.ServingStatus.SERVING
+};
+
 // grpc service definition
 const pingPongServiceProtoPath = path.join(__dirname, '..', 'ping-pong.proto');
 const pingPongServiceProtoDefinition = protoLoader.loadSync(pingPongServiceProtoPath);
@@ -34,6 +40,12 @@ function main() {
         PingPong,
         PingPongStream
     });
+
+    // gRPC health check
+    // Register the health service
+    const grpcHealthCheck = new GrpcHealthCheck(healthCheckStatusMap);
+
+    server.addService(HealthService, grpcHealthCheck);
 
     // gRPC server
     server.bind('0.0.0.0:50051', grpc.ServerCredentials.createInsecure());
