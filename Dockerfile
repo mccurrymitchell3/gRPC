@@ -14,4 +14,4 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.3.0 && \
 
 EXPOSE 50051
 
-CMD [ "npm", "start" ]
+CMD [ "npm", "start", "--prefix", "server" ]
