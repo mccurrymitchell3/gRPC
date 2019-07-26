@@ -24,7 +24,7 @@ function ping() {
     });
 }
 
-function bidirectionalStream() {
+function pingPong() {
     let call = client.PingPongStream();
     call.on('data', function(reply) {
         console.log(reply.pong);
@@ -49,7 +49,7 @@ function bidirectionalStream() {
     call.end();
 }
 
-function bidirectionalStreamPingPong() {
+function pingPongRally() {
     let call = client.PingPongStream();
     call.on('data', function(reply) {
         console.log(reply.pong);
@@ -83,9 +83,9 @@ function bidirectionalStreamPingPong() {
 }
 
 function main() {
-    ping();
-    bidirectionalStream();
-    bidirectionalStreamPingPong();
+    //ping();
+    //pingPong();
+    pingPongRally();
 }
 
 main();
