@@ -129,4 +129,4 @@ logs/
 ### Helm Stuff ###
 charts/
 requirements.lock
-!/nep-compute-service-api/src/main/java/com/ncr/nep/compute/cluster/ClusterManagementService.java
+helm/grpc-demo-setup/values.yaml

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "grpc-demo.fullname" . }}
+  labels:
+{{ include "grpc-demo.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "grpc-demo.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "grpc-demo.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 50051
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=localhost:50051"]
+            initialDelaySeconds: {{ .Values.deploy.livenessProbe.initialDelaySeconds }}
+          readinessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=localhost:50051"]
+            initialDelaySeconds: {{ .Values.deploy.readinessProbe.initialDelaySeconds }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-endpoint
+          image: "gcr.io/endpoints-release/endpoints-runtime:{{ .Values.deploy.esp.imageVersion }}"
+          imagePullPolicy: IfNotPresent
+          args: [
+            "--http_port", "{{ .Values.deploy.esp.args.httpPort }}",
+            "--service", "{{ .Values.deploy.esp.args.service }}",
+            "--rollout_strategy", "{{ .Values.deploy.esp.args.rolloutStrategy }}",
+            "--backend", "{{ .Values.deploy.esp.args.backend }}",
+            "--healthz", "healthz",
+            "--service_account_key", "{{ .Values.deploy.esp.args.saKey }}"
+          ]
+          ports:
+            - name: http
+              containerPort: {{ .Values.deploy.esp.args.httpPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.deploy.esp.args.httpPort }}
+            initialDelaySeconds: {{ .Values.deploy.livenessProbe.initialDelaySeconds }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.deploy.esp.args.httpPort }}
+            initialDelaySeconds: {{ .Values.deploy.livenessProbe.initialDelaySeconds }}
+          volumeMounts:
+            - name: gcloud-sa-key
+              mountPath: /var/secrets/google
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
