@@ -54,3 +54,9 @@ deploy:
       backend: "grpc://127.0.0.1:50051"
       saKey: "/var/secrets/google/sa-key.json"
 
+istio:
+  gateway:
+    name: grpc-demo
+    namespace: grpc-demo
+
+
