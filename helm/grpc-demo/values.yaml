@@ -5,7 +5,7 @@
 replicaCount: 10
 
 image:
-  repository: dockder.io/lg185110/grpc-demo
+  repository: docker.io/lg185110/grpc-demo
   tag: 0.1.0
   pullPolicy: Always
 
