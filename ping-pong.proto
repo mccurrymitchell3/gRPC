@@ -13,13 +13,14 @@ message Pong {
 service PingPongService {
     rpc PingPong (Ping) returns (Pong) {
         option (google.api.http) = {
-            post: "/pingpong/{ping}"
+            get: "/pingpong/{ping}"
         };
     }
 
     rpc PingPongStream (stream Ping) returns (stream Pong) {
         option (google.api.http) = {
-            post: "/pingpongstream/{ping}"
+            post: "/pingpong/stream"
+            body: "*"
         };
     }
 }

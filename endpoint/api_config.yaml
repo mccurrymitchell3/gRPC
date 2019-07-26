@@ -33,7 +33,7 @@ name: grpc-demo.endpoints.technical-services-dev.cloud.goog
 #
 endpoints:
   - name: grpc-demo.endpoints.technical-services-dev.cloud.goog
-    target: 34.66.43.70
+    target: 35.238.30.139
 
 #
 # API title to appear in the user interface (Google Cloud Console).
@@ -55,9 +55,8 @@ http:
     # Ping protobuf message. The response
     # will be the JSON representation of the 'Pong' message.
     #
-    - selector: PingPongService.Ping
-      post: /pingpong/ping
-      body: "*"
+    - selector: PingPongService.PingPong
+      get: /pingpong/{ping}
     #
     # HTTP/REST/JSON clients can call the 'Ping' method of the PingPongService
     # using the POST HTTP verb and the '/pingPong' URL path.
@@ -66,17 +65,7 @@ http:
     # will be the repeated JSON representation of the 'Pong' message.
     #
     - selector: PingPongService.PingPongStream
-      post: /pingpong/pingPong
-      body: "*"
-    #
-    # HTTP/REST/JSON clients can call the 'Ping' method of the PingPongService
-    # using the POST HTTP verb and the '/pingPongRally' URL path.
-    # The posted HTTP body is the repeated JSON respresentation of the
-    # Ping protobuf message. The response
-    # will be the repeated JSON representation of the 'Pong' message.
-    #
-    - selector: PingPongService.PingPongStream
-      post: /pingpong/pingPongRally
+      post: /pingpong/stream
       body: "*"
 
 #
