@@ -8,7 +8,7 @@ const pingPongProtoPath = path.join(__dirname + '..', '..', 'ping-pong.proto');
 const pingPongProtoDefinition = protoLoader.loadSync(pingPongProtoPath);
 const pingPongPackageDefinition = grpc.loadPackageDefinition(pingPongProtoDefinition);
 const client = new pingPongPackageDefinition.PingPongService(
-    'localhost:50051', grpc.credentials.createInsecure());
+    '35.238.30.139:50051', grpc.credentials.createInsecure());
 
 // handlers
 function ping() {
@@ -24,7 +24,7 @@ function ping() {
     });
 }
 
-function bidirectionalStream() {
+function pingPong() {
     let call = client.PingPongStream();
     call.on('data', function(reply) {
         console.log(reply.pong);
@@ -49,7 +49,7 @@ function bidirectionalStream() {
     call.end();
 }
 
-function bidirectionalStreamPingPong() {
+function pingPongRally() {
     let call = client.PingPongStream();
     call.on('data', function(reply) {
         console.log(reply.pong);
@@ -83,9 +83,10 @@ function bidirectionalStreamPingPong() {
 }
 
 function main() {
-    ping();
-    bidirectionalStream();
-    bidirectionalStreamPingPong();
+    [1, 2, 3, 4, 5].forEach(() => { ping() });
+    //ping();
+    //pingPong();
+    //pingPongRally();
 }
 
 main();

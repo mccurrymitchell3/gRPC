@@ -6,8 +6,6 @@ ADD server ${HOME}/app/server
 
 ADD ping-pong.proto ${HOME}/app
 
-RUN cd server
-
 RUN npm rebuild --prefix server
 
 RUN npm install --prefix server

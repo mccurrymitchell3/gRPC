@@ -20,22 +20,54 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      volumes:
+        - name: gcloud-sa-key
+          secret:
+            secretName: gcloud-sa-key
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
+            - containerPort: 50051
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=localhost:50051"]
+            initialDelaySeconds: {{ .Values.deploy.livenessProbe.initialDelaySeconds }}
+          readinessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=localhost:50051"]
+            initialDelaySeconds: {{ .Values.deploy.readinessProbe.initialDelaySeconds }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-endpoint
+          image: "gcr.io/endpoints-release/endpoints-runtime:{{ .Values.deploy.esp.imageVersion }}"
+          imagePullPolicy: IfNotPresent
+          args: [
+            "--http_port", "{{ .Values.deploy.esp.args.httpPort }}",
+            "--service", "{{ .Values.deploy.esp.args.service }}",
+            "--rollout_strategy", "{{ .Values.deploy.esp.args.rolloutStrategy }}",
+            "--backend", "{{ .Values.deploy.esp.args.backend }}",
+            "--healthz", "healthz",
+            "--service_account_key", "{{ .Values.deploy.esp.args.saKey }}"
+          ]
+          ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.deploy.esp.args.httpPort }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /healthz
+              port: {{ .Values.deploy.esp.args.httpPort }}
+            initialDelaySeconds: {{ .Values.deploy.livenessProbe.initialDelaySeconds }}
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /healthz
+              port: {{ .Values.deploy.esp.args.httpPort }}
+            initialDelaySeconds: {{ .Values.deploy.livenessProbe.initialDelaySeconds }}
+          volumeMounts:
+            - name: gcloud-sa-key
+              mountPath: /var/secrets/google
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

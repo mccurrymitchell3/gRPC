@@ -17,5 +17,10 @@ service PingPongService {
         };
     }
 
-    rpc PingPongStream (stream Ping) returns (stream Pong) {}
+    rpc PingPongStream (stream Ping) returns (stream Pong) {
+        option (google.api.http) = {
+            post: "/pingpong/stream"
+            body: "*"
+        };
+    }
 }
