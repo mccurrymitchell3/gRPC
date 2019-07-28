@@ -26,14 +26,14 @@ config_version: 3
 #
 # Name of the service configuration.
 #
-name: grpc-demo.endpoints.technical-services-dev.cloud.goog
+name: grpc-istio-demo.endpoints.technical-services-dev.cloud.goog
 
 #
 # Configuring DNS
 #
 endpoints:
-  - name: grpc-demo.endpoints.technical-services-dev.cloud.goog
-    target: 35.238.30.139
+  - name: grpc-istio-demo.endpoints.technical-services-dev.cloud.goog
+    target: "35.226.87.43"
 
 #
 # API title to appear in the user interface (Google Cloud Console).

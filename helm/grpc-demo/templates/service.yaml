@@ -16,5 +16,24 @@ spec:
       protocol: TCP
       name: http
   selector:
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: {{ include "grpc-demo.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "grpc-demo.fullname" . }}-backend
+  labels:
+{{ include "grpc-demo.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: 50051
+    protocol: TCP
+    name: http2
+  selector:
+    app.kubernetes.io/component: backend
     app.kubernetes.io/name: {{ include "grpc-demo.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

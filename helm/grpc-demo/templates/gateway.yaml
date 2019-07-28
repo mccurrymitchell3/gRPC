@@ -1,9 +1,10 @@
-{{- if .Values.gateway.enabled -}}
+{{- if .Values.istio.gateway.enabled -}}
 {{- $fullName := include "grpc-demo.fullname" . -}}
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: {{ $fullName }}-gateway
+  name: {{ .Values.istio.gateway.name }}
+  namespace: {{ .Values.istio.gateway.namespace }}
 spec:
   selector:
     istio: ingressgateway # use istio default controller
@@ -19,7 +20,7 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-      - "*"
+      - {{ .Values.deploy.esp.args.service }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -48,7 +49,7 @@ spec:
   hosts:
     - "*"
   gateways:
-    - {{ $fullName }}-gateway
+    - {{ .Values.istio.gateway.name }}.{{ .Values.istio.gateway.namespace }}.svc.cluster.local
   http:
     - match:
         - uri:
@@ -68,4 +69,6 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
+    tls:
+      mode: ISTIO_MUTUAL
 {{- end }}

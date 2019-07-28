@@ -11,6 +11,18 @@ const { GrpcHealthCheck, HealthCheckResponse, HealthService } = require('grpc-ts
 const healthCheckStatusMap = {
     "": HealthCheckResponse.ServingStatus.SERVING
 };
+const backendUri = process.env.ENV_VARIABLE;
+let client = null;
+
+// gRPC client
+const pingPongProtoPath = path.join(__dirname, '..', 'ping-pong.proto');
+const pingPongProtoDefinition = protoLoader.loadSync(pingPongProtoPath);
+const pingPongPackageDefinition = grpc.loadPackageDefinition(pingPongProtoDefinition);
+
+if (backendUri) {
+    client = new pingPongPackageDefinition.PingPongService(
+        backendUri, grpc.credentials.createInsecure());
+}
 
 // grpc service definition
 const pingPongServiceProtoPath = path.join(__dirname, '..', 'ping-pong.proto');
@@ -18,9 +30,18 @@ const pingPongServiceProtoDefinition = protoLoader.loadSync(pingPongServiceProto
 const pingPongServicePackageDefinition = grpc.loadPackageDefinition(pingPongServiceProtoDefinition);
 
 function PingPong(call, callback) {
-    const ping = call.request.ping;
-    let pong = `Hello, ${ping}! This is ${os.hostname()}.`;
-    callback(null, {pong: pong});
+    if (client !== null) {
+        client.PingPongBackend(call.request, (err, result) => {
+            if (err) {
+                callback(err, {pong: 'Backend unavailable.'});
+            } else {
+                callback(null, result);
+            }
+        });
+    } else {
+        callback(null, {pong: 'Backend unavailable.'});
+    }
+
 }
 
 function PingPongStream(call) {
@@ -33,12 +54,19 @@ function PingPongStream(call) {
     });
 }
 
+function PingPongBackend(call, callback) {
+    const ping = call.request.ping;
+    let pong = `Hello, ${ping}! This is ${os.hostname()}.`;
+    callback(null, {pong: pong});
+}
+
 function main() {
     const server = new grpc.Server();
     // gRPC service
     server.addService(pingPongServicePackageDefinition.PingPongService.service, {
         PingPong,
-        PingPongStream
+        PingPongStream,
+        PingPongBackend
     });
 
     // gRPC health check

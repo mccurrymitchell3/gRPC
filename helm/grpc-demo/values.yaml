@@ -6,7 +6,7 @@ replicaCount: 10
 
 image:
   repository: docker.io/lg185110/grpc-demo
-  tag: 0.1.0
+  tag: 0.1.1
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -49,14 +49,15 @@ deploy:
     imageVersion: 1.35.0
     args:
       httpPort: 8080
-      service: "grpc-demo.endpoints.technical-services-dev.cloud.goog"
+      service: "grpc-istio-demo.endpoints.technical-services-dev.cloud.goog"
       rolloutStrategy: managed
       backend: "grpc://127.0.0.1:50051"
       saKey: "/var/secrets/google/sa-key.json"
 
 istio:
   gateway:
-    name: grpc-demo
-    namespace: grpc-demo
+    enabled: true
+    name: grpc-demo-gateway
+    namespace: istio-system
 
 
