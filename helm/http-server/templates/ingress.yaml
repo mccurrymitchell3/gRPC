@@ -1,0 +1,17 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "http-server.fullname" . -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+{{ include "http-server.labels" . | indent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  backend:
+    serviceName: {{ include "http-server.fullname" . }}
+    servicePort: {{ .Values.service.port }}
+{{- end }}
