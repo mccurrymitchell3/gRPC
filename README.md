@@ -1,5 +1,5 @@
 # gRPC-Demo
-Demo gRPC app for tech conference
+This demo was created for the NCR tech conference
 
 This is to demonstrate
 
